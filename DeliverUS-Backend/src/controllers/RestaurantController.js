@@ -95,12 +95,32 @@ const destroy = async function (req, res) {
   }
 }
 
+const promoteController = async function (req, res) {
+  // Only returns PUBLIC information of restaurants
+  console.log('hola')
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId)
+    const restaurants = await Restaurant.findOne({ where: { isPromoted: true } })
+    if (restaurants) {
+      restaurants.isPromoted = false
+      restaurants.save()
+    }
+    restaurant.isPromoted = true
+    restaurant.save()
+
+    res.json(restaurant)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
 const RestaurantController = {
   index,
   indexOwner,
   create,
   show,
   update,
-  destroy
+  destroy,
+  promoteController
 }
 export default RestaurantController

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Image, Platform, Pressable, ScrollView, StyleSheet, View, Switch } from 'react-native'
 import * as ExpoImagePicker from 'expo-image-picker'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import * as yup from 'yup'
 import DropDownPicker from 'react-native-dropdown-picker'
-import { create, getRestaurantCategories } from '../../api/RestaurantEndpoints'
+import { create, getRestaurantCategories, getAll, remove } from '../../api/RestaurantEndpoints'
 import InputItem from '../../components/InputItem'
 import TextRegular from '../../components/TextRegular'
 import * as GlobalStyles from '../../styles/GlobalStyles'
@@ -120,6 +120,25 @@ export default function CreateRestaurantScreen ({ navigation }) {
       setBackendErrors(error.errors)
     }
   }
+
+  async function checkMorePromoted () {
+    try {
+      const fetchedRestaurants = await getAll()
+      const fetchedRestaurantsReShaped = fetchedRestaurants.filter((e) => e.isPromoted === true)
+      if (fetchedRestaurantsReShaped.length > 0) {
+        return true
+      }
+      return false
+    } catch (error) {
+      showMessage({
+        message: `There was an error while retrieving product categories. ${error} `,
+        type: 'error',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    }
+  }
+
   return (
     <Formik
       validationSchema={validationSchema}
@@ -207,9 +226,22 @@ export default function CreateRestaurantScreen ({ navigation }) {
               {backendErrors &&
                 backendErrors.map((error, index) => <TextError key={index}>{error.param}-{error.msg}</TextError>)
               }
+              <TextRegular>Is it promoted? </TextRegular>
+              <Switch
+                trackColor={{ false: GlobalStyles.brandSecondary, true: GlobalStyles.brandPrimary }}
+                thumbColor={values.isPromoted ? GlobalStyles.brandSecondary : '#f4f3f4'}
+                value={values.isPromoted}
+                style={styles.switch}
+                onValueChange={value =>
+                  setFieldValue('isPromoted', value)
 
+                }
+              />
+               checkMorePromoted && <TextError> You can only promote one restaurant at a time</TextError>
               <Pressable
-                onPress={handleSubmit}
+                onPress={handleSubmit
+
+                }
                 style={({ pressed }) => [
                   {
                     backgroundColor: pressed

@@ -94,6 +94,7 @@ export default function CreateProductScreen ({ navigation, route }) {
       setBackendErrors(error.errors)
     }
   }
+
   return (
     <Formik
       validationSchema={validationSchema}
@@ -148,7 +149,6 @@ export default function CreateProductScreen ({ navigation, route }) {
                 }
               />
               <ErrorMessage name={'availability'} render={msg => <TextError>{msg}</TextError> }/>
-
               <Pressable onPress={() =>
                 pickImage(
                   async result => {
